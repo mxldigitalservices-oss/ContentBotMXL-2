@@ -1,0 +1,31 @@
+{
+  "proyecto": "ContentBotMXL",
+  "categoria": "Videos Infantiles e Inteligencia Artificial",
+  "instruccion_creativa": "Selecciona de manera aleatoria o secuencial uno de estos temas y desarrolla un guión completo, atractivo y educativo para un video corto.",
+  "lista_temas": [
+    {
+      "id": 1,
+      "tema": "El Robot que quería aprender a sonreír",
+      "enfoque": "Emociones y tecnología para niños",
+      "tono": "Divertido y tierno"
+    },
+    {
+      "id": 2,
+      "tema": "Viaje al centro de una computadora: ¿Cómo viajan los packets de internet?",
+      "enfoque": "Educativo y científico simplificado",
+      "tono": "Emocionante y dinámico"
+    },
+    {
+      "id": 3,
+      "tema": "El ratoncito espacial y la luna de queso inteligente",
+      "enfoque": "Fantasía espacial y creatividad",
+      "tono": "Mágico y relajante"
+    },
+    {
+      "id": 4,
+      "tema": "Cómo la Inteligencia Artificial ayuda a los animales a hablar con los humanos",
+      "enfoque": "Naturaleza y tecnología del futuro",
+      "tono": "Curioso y asombroso"
+    }
+  ]
+}

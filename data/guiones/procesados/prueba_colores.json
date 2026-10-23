@@ -1,0 +1,9 @@
+{
+  "titulo": "Los colores primarios",
+  "escenas": [
+    {"emocion": "feliz", "texto": "¡Hola amigos! Hoy vamos a aprender los colores primarios."},
+    {"emocion": "pensativo", "texto": "¿Sabías que solo hay tres colores primarios?"},
+    {"emocion": "sorprendido", "texto": "Rojo, amarillo y azul. ¡Con ellos se hacen todos los demás!"},
+    {"emocion": "con_amigos", "texto": "¡Ahora practiquemos juntos! Nos vemos en el próximo video."}
+  ]
+}

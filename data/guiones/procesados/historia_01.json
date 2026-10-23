@@ -1,0 +1,9 @@
+{
+  "titulo": "La Abeja Trabajadora",
+  "escenas": [
+    {"emocion": "feliz", "texto": "¡Hola! Hoy conoceremos a una amiga muy especial: la abeja."},
+    {"emocion": "pensativo", "texto": "Las abejas vuelan de flor en flor para recoger néctar y fabricar miel."},
+    {"emocion": "sorprendido", "texto": "¡Gracias a ellas nuestras plantas crecen fuertes y tenemos frutas!"},
+    {"emocion": "con_amigos", "texto": "¡Qué importante es cuidar a las abejas! ¿Sabías esto?"}
+  ]
+}
