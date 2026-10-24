@@ -54,7 +54,14 @@ class Settings:
 
     # --- Unicas variables de IA/voz que este servicio tiene permitido usar ---
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-    TTS_VOZ = os.getenv("TTS_VOZ", "es-MX-DaliaNeural")
+    TTS_VOZ = os.getenv("TTS_VOZ", "es-MX-DaliaNeural")  # voz de edge-tts (motor de respaldo)
+    TTS_MOTORES = [
+        m.strip().lower()
+        for m in os.getenv("TTS_MOTORES", "gtts,edge").split(",")
+        if m.strip()
+    ]  # orden de motores de voz: el primero es el principal
+    TTS_IDIOMA = os.getenv("TTS_IDIOMA", "es")        # idioma de gTTS
+    TTS_GTTS_TLD = os.getenv("TTS_GTTS_TLD", "com.mx")  # acento de gTTS (com.mx = Mexico)
 
     # --- Autenticacion del webhook (Servidor 1 -> Servidor 2) ---
     N8N_WEBHOOK_SECRET = os.getenv("N8N_WEBHOOK_SECRET", "")
