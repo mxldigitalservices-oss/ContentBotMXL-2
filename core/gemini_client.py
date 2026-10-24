@@ -9,6 +9,7 @@ mismo repo- como instruccion base. Usa exclusivamente GEMINI_API_KEY.
 import json
 import logging
 import re
+import time
 
 from config.settings import settings
 from core.http_retry import post_con_reintentos
@@ -21,6 +22,12 @@ GEMINI_URL = (
 )
 
 EMOCIONES_VALIDAS = ("feliz", "pensativo", "sorprendido", "con_amigos", "hablando")
+
+# Espera de la llamada a Gemini: (conexion, lectura) en segundos.
+# La lectura es lo que tarda Gemini en contestar; 60s se quedaba corto en
+# Railway. Si se agota, http_retry.py reintenta solo (hasta GEMINI_MAX_INTENTOS).
+GEMINI_TIMEOUT = (10, 120)
+GEMINI_MAX_INTENTOS = 3
 
 
 def _cargar_prompt_maestro() -> str:
@@ -68,12 +75,15 @@ def generar_guion(tema: str, num_escenas: int = 4) -> dict:
         },
     }
 
+    inicio = time.monotonic()
     resp = post_con_reintentos(
         GEMINI_URL,
+        max_intentos=GEMINI_MAX_INTENTOS,
         params={"key": settings.GEMINI_API_KEY},
         json=body,
-        timeout=60,
+        timeout=GEMINI_TIMEOUT,
     )
+    logger.info("Gemini respondio en %.1fs (HTTP %s)", time.monotonic() - inicio, resp.status_code)
     if resp.status_code >= 400:
         raise RuntimeError(f"Gemini devolvio un error ({resp.status_code}): {resp.text}")
     data = resp.json()

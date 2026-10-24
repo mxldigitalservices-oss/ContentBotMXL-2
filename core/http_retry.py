@@ -92,6 +92,15 @@ def _parsear_error_google(resp: requests.Response) -> dict:
     return detalle
 
 
+EXCEPCIONES_RED = (requests.exceptions.Timeout, requests.exceptions.ConnectionError)
+
+
+def _ocultar_secretos(texto) -> str:
+    """requests mete la URL completa (con ?key=API_KEY) en los mensajes de error
+    de conexion. Se tapa la clave antes de escribirla en logs o devolverla por HTTP."""
+    return re.sub(r"(key=)[^&\s)'\"]+", r"\1***", str(texto))
+
+
 def post_con_reintentos(
     url: str,
     max_intentos: int = 4,
@@ -107,16 +116,35 @@ def post_con_reintentos(
     Lanza GoogleAPIError (con el detalle real de Google) si se agotan los
     intentos o si detecta un limite diario. Para errores que no sean 429/503
     devuelve la respuesta tal cual (quien llama decide que hacer con ella).
+
+    Tambien reintenta (con la misma espera creciente) cuando falla la red:
+    timeout de lectura/conexion o conexion caida. Si el ultimo intento fue un
+    fallo de red, lanza RuntimeError con la API key ocultada.
     """
-    ultimo_error = None
+    ultimo_error = None      # ultima respuesta HTTP reintentable
+    ultimo_fallo_red = None  # ultimo timeout / conexion caida
 
     for intento in range(1, max_intentos + 1):
-        resp = requests.post(url, **kwargs)
+        try:
+            resp = requests.post(url, **kwargs)
+        except EXCEPCIONES_RED as e:
+            ultimo_fallo_red = e
+            ultimo_error = None
+            if intento == max_intentos:
+                break
+            espera = espera_base_seg * (2 ** (intento - 1))
+            logger.warning(
+                "Fallo de red al llamar a Google (intento %s/%s): %s: %s. Reintentando en %.0fs...",
+                intento, max_intentos, type(e).__name__, _ocultar_secretos(e), espera,
+            )
+            time.sleep(espera)
+            continue
 
         if resp.status_code not in CODIGOS_REINTENTABLES:
             return resp
 
         ultimo_error = resp
+        ultimo_fallo_red = None
         detalle = _parsear_error_google(resp)
 
         if detalle.get("es_limite_diario"):
@@ -145,4 +173,9 @@ def post_con_reintentos(
         )
         time.sleep(espera)
 
-    raise GoogleAPIError(ultimo_error, _parsear_error_google(ultimo_error))
+    if ultimo_error is not None:
+        raise GoogleAPIError(ultimo_error, _parsear_error_google(ultimo_error))
+    raise RuntimeError(
+        f"No se pudo contactar a Google tras {max_intentos} intentos "
+        f"({type(ultimo_fallo_red).__name__}): {_ocultar_secretos(ultimo_fallo_red)}"
+    ) from None
